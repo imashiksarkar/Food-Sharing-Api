@@ -42,6 +42,16 @@ class FoodController {
 
     res.status(200).json(data)
   })
+
+  findFoodById = catchAsync(async (req: ReqWithUser, res: Response) => {
+    const { data, error } = await this.foodService.findFoodById(
+      req.params.foodId
+    )
+
+    if (error) throw Err.setStatus('BadRequest').setMessage(error)
+
+    res.status(200).json(data)
+  })
 }
 
 const foodController = new FoodController(foodService)

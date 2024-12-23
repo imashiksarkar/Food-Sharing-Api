@@ -31,4 +31,19 @@ export interface IFoodService {
     foodInput: AddFoodDto
   ) => Promise<FoodRes<IFoodDocument>>
   findAllFoods: () => Promise<FoodRes<IFoodDocument[]>>
+  findFoodById: (id: string) => Promise<FoodRes<IFoodDocument | null>>
+  // deleteFoodById: (id: string) => Promise<FoodRes<IFoodDocument | null>>
+  // updateFoodById: (
+  //   id: string,
+  //   foodInput: AddFoodDto
+  // ) => Promise<FoodRes<IFoodDocument | null>>
+  // findFoodsByAuthorEmail: (
+  //   authorEmail: string
+  // ) => Promise<FoodRes<IFoodDocument[]>>
+  // findFoodsByCategory: (
+  //   category: string
+  // ) => Promise<FoodRes<IFoodDocument[]>>
+  // findFoodsByExpiresAt: (
+  //   expiresAt: Date
+  // ) => Promise<FoodRes<IFoodDocument[]>>
 }
