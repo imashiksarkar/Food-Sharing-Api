@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
+import { ReqWithUser } from '../middlewares/requireAuth'
 
-type CB = (req: Request, res: Response, next: NextFunction) => void
+type CB = (req: ReqWithUser, res: Response, next: NextFunction) => void
 
 const catchAsync =
   (cb: CB) => async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await cb(req, res, next)
+      await cb(req as ReqWithUser, res, next)
     } catch (error) {
       next(error)
     }

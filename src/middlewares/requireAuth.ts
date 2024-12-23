@@ -1,37 +1,37 @@
 import { NextFunction, Request, Response } from 'express'
-import { DecodedIdToken } from 'firebase-admin/auth'
 import { Err } from 'http-staror'
-import FirebaseService from '../services/firebase.service'
+import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken'
+import authService from '../services/auth.service'
 import catchAsync from '../utils/catchAsync'
 
 export interface ReqWithUser<T extends 'passThrough' | unknown = unknown>
   extends Request {
   locals: {
-    user: T extends 'passThrough' ? DecodedIdToken | null : DecodedIdToken
+    user: T extends 'passThrough' ? JwtPayload | null : JwtPayload
   }
 }
 
 const requireAuth = (passThrough = false) =>
-  catchAsync(async (req: Request, _res: Response, next: NextFunction) => {
-    const token = req.headers?.authorization?.split(' ')[1]
-    if (!token)
-      throw Err.setStatus('Unauthorized').setMessage('Login Required.')
+  catchAsync(
+    async (
+      req: ReqWithUser<'passThrough'>,
+      _res: Response,
+      next: NextFunction
+    ) => {
+      const token = (req.cookies.access_token || '') as string
 
-    const request = req as ReqWithUser<'passThrough'>
-    try {
-      const user = await FirebaseService.verifyUserToken(token)
-      request.locals.user = user
+      const { data, error } = authService.verifyToken(token)
+      req.locals = {
+        user: data,
+      }
+
+      if (error && passThrough) return next()
+      else if (error && error instanceof JsonWebTokenError)
+        throw Err.setStatus('Unauthorized').setMessage(error.message)
+      else if (error) throw Err.setStatus('Unauthorized').setMessage(error)
 
       return next()
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_error: unknown) {
-      request.locals.user = null
-
-      if (passThrough) return next()
-
-      throw Err.setStatus('Unauthorized').setMessage('Unauthorized')
     }
-  })
+  )
 
 export default requireAuth

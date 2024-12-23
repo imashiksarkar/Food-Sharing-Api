@@ -4,13 +4,15 @@ import catchAsync from '../utils/catchAsync'
 import { Err } from 'http-staror'
 import env from '../config/env.config'
 import { IAuthService } from '../types/auth.types'
-import AuthService from '../services/auth.service'
+import authService from '../services/auth.service'
 import { JsonWebTokenError } from 'jsonwebtoken'
+// import { ReqWithUser } from '../middlewares/requireAuth'
+// import { ReqWithUser } from '../middlewares/requireAuth'
 
 class AuthController {
   constructor(private authService: IAuthService) {}
 
-  getToken = catchAsync((req: Request, res: Response) => {
+  getToken = catchAsync(async (req: Request, res: Response) => {
     const { success, data, error } = authDto.safeParse(req.body)
     if (!success) throw Err.setStatus('BadRequest').setMessage(error?.message)
 
@@ -31,13 +33,16 @@ class AuthController {
     res.end()
   })
 
-  logOut = catchAsync((_req: Request, res: Response) => {
+  logOut = catchAsync(async (_req: Request, res: Response) => {
     res.clearCookie('access_token')
     res.status(200).end()
   })
+
+  // checkAuth = catchAsync(async (req: ReqWithUser, res: Response) => {
+  //   res.status(200).json(req.locals.user)
+  // })
 }
 
-const authService = new AuthService()
 const authController = new AuthController(authService)
 
 export default authController
