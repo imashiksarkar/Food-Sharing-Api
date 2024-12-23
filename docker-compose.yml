@@ -1,0 +1,11 @@
+services:
+  mongo:
+    image: mongo
+    container_name: FoodSharing-Mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./db_vol:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret

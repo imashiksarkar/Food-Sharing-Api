@@ -1,0 +1,12 @@
+src
+db_vol
+.vscode
+.DS_Store
+.dockerignore
+Dockerfile
+docker-compose.yml
+.env.demo
+eslint.config.mjs
+README.md
+Todo.md
+tsconfig.json

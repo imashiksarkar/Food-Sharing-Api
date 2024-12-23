@@ -1,0 +1,8 @@
+node_modules/
+dist/
+Todo.md
+.env.local
+db_vol
+*.privateKey.*
+.vercel
+README.backup.md
