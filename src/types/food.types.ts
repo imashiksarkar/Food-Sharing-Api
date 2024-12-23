@@ -20,11 +20,15 @@ export interface IFoodDocument extends Document, IFood {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IFoodModel extends Model<IFoodDocument> {}
 
-export interface FoodRes {
-  data: IFoodDocument | null
+export interface FoodRes<T> {
+  data: T | null
   error: string | null
 }
 
 export interface IFoodService {
-  addFood: (authorEmail: string, foodInput: AddFoodDto) => Promise<FoodRes>
+  addFood: (
+    authorEmail: string,
+    foodInput: AddFoodDto
+  ) => Promise<FoodRes<IFoodDocument>>
+  findAllFoods: () => Promise<FoodRes<IFoodDocument[]>>
 }

@@ -16,8 +16,6 @@ class FoodController {
       error: validationError,
     } = addFoodDto.safeParse(req.body)
 
-    
-
     if (!success)
       throw Err.setStatus('BadRequest').setMessage(validationError?.message)
 
@@ -33,6 +31,14 @@ class FoodController {
     const { data, error } = await this.foodService.addFood(authorEmail, body)
 
     if (error) throw Err.setStatus('BadRequest').setMessage(error)
+
+    res.status(200).json(data)
+  })
+
+  findAllFoods = catchAsync(async (_req: ReqWithUser, res: Response) => {
+    const { data, error } = await this.foodService.findAllFoods()
+
+    if (error) throw Err.setStatus('InternalServerError').setMessage(error)
 
     res.status(200).json(data)
   })
