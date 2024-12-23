@@ -11,7 +11,13 @@ const envParser = z.object({
     .string()
     .transform((port) => parseInt(port))
     .refine((port) => !isNaN(port), { message: 'Port Must Be Number.' }),
-  DB_CoNNECTION_URL: z.string().trim().url('Invalid Database URL.'),
+  DB_CONNECTION_URL: z.string().trim().url('Invalid Database URL.'),
+  IS_PRODUCTION: z
+    .string()
+    .trim()
+    .default('development')
+    .transform((nodeEnv) => nodeEnv === 'production'),
+  JWT_SECRET: z.string().trim().min(3, 'JWT Secret must be 3 chars or more.'),
 })
 
 const { success, data, error } = envParser.safeParse(process.env)

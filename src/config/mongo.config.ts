@@ -12,7 +12,7 @@ class DBConfig {
     }
 
     try {
-      const db = await mongoose.connect(env.DB_CoNNECTION_URL, {
+      const db = await mongoose.connect(env.DB_CONNECTION_URL, {
         family: 4,
         authSource: 'admin',
         serverSelectionTimeoutMS: 5000,
