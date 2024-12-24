@@ -176,6 +176,25 @@ class FoodService implements IFoodService {
 
     return res
   }
+
+  findEndingSoonestFoods = async () => {
+    const res: FoodRes<IFoodDocument[]> = {
+      data: null,
+      error: null,
+    }
+
+    try {
+      const foods = await Food.find({}).sort({ expirationDate: 1 }).limit(10)
+
+      res.data = foods
+    } catch (error) {
+      if (error instanceof MongooseError) res.error = error.message
+      else if (typeof error === 'string') res.error = error
+      else res.error = 'Unknown error - add food service'
+    }
+
+    return res
+  }
 }
 
 const foodService = new FoodService()

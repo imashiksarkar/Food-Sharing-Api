@@ -85,8 +85,8 @@ class FoodController {
   })
 
   findFoodByCategory = catchAsync(async (req: ReqWithUser, res: Response) => {
-    console.log(req.params.categoryName);
-    
+    console.log(req.params.categoryName)
+
     const { data, error } = await this.foodService.findFoodsByCategory(
       req.params.categoryName
     )
@@ -95,6 +95,16 @@ class FoodController {
 
     res.status(200).json(data)
   })
+
+  findEndingSoonestFoods = catchAsync(
+    async (_req: ReqWithUser, res: Response) => {
+      const { data, error } = await this.foodService.findEndingSoonestFoods()
+
+      if (error) throw Err.setStatus('InternalServerError').setMessage(error)
+
+      res.status(200).json(data)
+    }
+  )
 }
 
 const foodController = new FoodController(foodService)

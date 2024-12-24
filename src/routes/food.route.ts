@@ -9,6 +9,8 @@ foodRouter
   .get(foodController.findAllFoods)
   .post(requireAuth(), foodController.addFood)
 
+foodRouter.get('/endingSoon', foodController.findEndingSoonestFoods)
+
 foodRouter
   .route('/:foodId')
   .get(foodController.findFoodById)
