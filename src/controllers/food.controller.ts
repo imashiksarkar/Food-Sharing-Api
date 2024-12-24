@@ -73,6 +73,16 @@ class FoodController {
 
     res.status(200).json(data)
   })
+
+  findFoodsByAuthor = catchAsync(async (req: ReqWithUser, res: Response) => {
+    const { data, error } = await this.foodService.findFoodsByAuthorEmail(
+      req.params.email
+    )
+
+    if (error) throw Err.setStatus('InternalServerError').setMessage(error)
+
+    res.status(200).json(data)
+  })
 }
 
 const foodController = new FoodController(foodService)

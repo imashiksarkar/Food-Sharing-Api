@@ -138,6 +138,25 @@ class FoodService implements IFoodService {
 
     return res
   }
+
+  findFoodsByAuthorEmail = async (authorEmail: string) => {
+    const res: FoodRes<IFoodDocument[]> = {
+      data: null,
+      error: null,
+    }
+
+    try {
+      const foods = await Food.find({ authorEmail })
+
+      res.data = foods
+    } catch (error) {
+      if (error instanceof MongooseError) res.error = error.message
+      else if (typeof error === 'string') res.error = error
+      else res.error = 'Unknown error - add food service'
+    }
+
+    return res
+  }
 }
 
 const foodService = new FoodService()

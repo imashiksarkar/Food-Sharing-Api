@@ -48,9 +48,9 @@ export interface IFoodService {
     id: string,
     authorEmail: string
   ) => Promise<FoodRes<IFoodDocument | null>>
-  // findFoodsByAuthorEmail: (
-  //   authorEmail: string
-  // ) => Promise<FoodRes<IFoodDocument[]>>
+  findFoodsByAuthorEmail: (
+    authorEmail: string
+  ) => Promise<FoodRes<IFoodDocument[]>>
   // findFoodsByCategory: (
   //   category: string
   // ) => Promise<FoodRes<IFoodDocument[]>>
