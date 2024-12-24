@@ -7,6 +7,7 @@ import {
   IFoodDocument,
   IFoodService,
 } from '../types/food.types'
+import { Err } from 'http-staror'
 
 class FoodService implements IFoodService {
   addFood = async (authorDetails: AuthorDetails, foodInput: AddFoodDto) => {
@@ -99,6 +100,38 @@ class FoodService implements IFoodService {
       res.data = food
     } catch (error) {
       if (error instanceof MongooseError) res.error = error.message
+      else if (typeof error === 'string') res.error = error
+      else res.error = 'Unknown error - add food service'
+    }
+
+    return res
+  }
+
+  deleteFood = async (id: string, authorEmail: string) => {
+    const res: FoodRes<IFoodDocument> = {
+      data: null,
+      error: null,
+    }
+
+    if (!isValidObjectId(id)) {
+      res.error = 'Invalid id'
+      return res
+    }
+
+    try {
+      const food = await Food.findOneAndDelete(
+        { _id: id, authorEmail },
+        { new: true }
+      )
+      if (!food) {
+        res.error = 'Food not found'
+        throw Err.setStatus('NotFound').setMessage('Food not found')
+      }
+
+      res.data = food
+    } catch (error) {
+      if (error instanceof Err) throw error
+      else if (error instanceof MongooseError) res.error = error.message
       else if (typeof error === 'string') res.error = error
       else res.error = 'Unknown error - add food service'
     }

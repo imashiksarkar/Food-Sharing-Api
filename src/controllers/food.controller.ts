@@ -62,6 +62,17 @@ class FoodController {
 
     res.status(200).json(data)
   })
+
+  deleteFood = catchAsync(async (req: ReqWithUser, res: Response) => {
+    const { data, error } = await this.foodService.deleteFood(
+      req.params.foodId,
+      req.locals.user.email
+    )
+
+    if (error) throw Err.setStatus('BadRequest').setMessage(error)
+
+    res.status(200).json(data)
+  })
 }
 
 const foodController = new FoodController(foodService)

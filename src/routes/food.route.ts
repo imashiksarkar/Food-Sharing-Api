@@ -13,5 +13,6 @@ foodRouter
   .route('/:foodId')
   .get(foodController.findFoodById)
   .put(requireAuth(), foodController.updateFood)
+  .delete(requireAuth(), foodController.deleteFood)
 
 export default foodRouter
