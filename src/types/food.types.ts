@@ -10,10 +10,7 @@ export interface AuthorDetails {
 }
 
 // mongoose input data
-export interface IFood extends AddFoodDto, AuthorDetails {
-  // authorEmail: string
-  // donatorName: string
-}
+export interface IFood extends AddFoodDto, AuthorDetails {}
 
 // data from database
 export interface IFoodDocument extends Document, IFood {
