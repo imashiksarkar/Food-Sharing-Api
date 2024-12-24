@@ -15,6 +15,7 @@ foodRouter
   .put(requireAuth(), foodController.updateFood)
   .delete(requireAuth(), foodController.deleteFood)
 
-foodRouter.route('/author/:email').get(foodController.findFoodsByAuthor)
+foodRouter.get('/author/:email', foodController.findFoodsByAuthor)
+foodRouter.get('/category/:categoryName', foodController.findFoodByCategory)
 
 export default foodRouter
