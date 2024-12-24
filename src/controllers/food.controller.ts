@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { Err } from 'http-staror'
-import addFoodDto, { verifyEmail } from '../dtos/food.dto'
+import addFoodDto from '../dtos/food.dto'
 import { ReqWithUser } from '../middlewares/requireAuth'
 import foodService from '../services/food.service'
 import { IFoodService } from '../types/food.types'
@@ -19,20 +19,19 @@ class FoodController {
     if (!success)
       throw Err.setStatus('BadRequest').setMessage(validationError?.message)
 
-    const {
-      success: emailSuccess,
-      data: authorEmail,
-      error: emailError,
-    } = verifyEmail.safeParse(req.locals.user.email)
+    const { email: authorEmail, name: donatorName } = req.locals.user
 
-    if (!emailSuccess)
-      throw Err.setStatus('BadRequest').setMessage(emailError?.message)
-
-    const { data, error } = await this.foodService.addFood(authorEmail, body)
+    const { data, error } = await this.foodService.addFood(
+      {
+        authorEmail,
+        donatorName,
+      },
+      body
+    )
 
     if (error) throw Err.setStatus('BadRequest').setMessage(error)
 
-    res.status(200).json(data)
+    res.status(201).json(data)
   })
 
   findAllFoods = catchAsync(async (_req: ReqWithUser, res: Response) => {
@@ -46,6 +45,17 @@ class FoodController {
   findFoodById = catchAsync(async (req: ReqWithUser, res: Response) => {
     const { data, error } = await this.foodService.findFoodById(
       req.params.foodId
+    )
+
+    if (error) throw Err.setStatus('BadRequest').setMessage(error)
+
+    res.status(200).json(data)
+  })
+
+  updateFood = catchAsync(async (req: ReqWithUser, res: Response) => {
+    const { data, error } = await this.foodService.updateFoodById(
+      req.params.foodId,
+      req.body
     )
 
     if (error) throw Err.setStatus('BadRequest').setMessage(error)

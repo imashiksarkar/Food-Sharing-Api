@@ -4,8 +4,14 @@ import requireAuth from '../middlewares/requireAuth'
 
 const foodRouter = Router()
 
-foodRouter.get('/', foodController.findAllFoods)
-foodRouter.post('/', requireAuth(), foodController.addFood)
-foodRouter.get('/:foodId', foodController.findFoodById)
+foodRouter
+  .route('/')
+  .get(foodController.findAllFoods)
+  .post(requireAuth(), foodController.addFood)
+
+foodRouter
+  .route('/:foodId')
+  .get(foodController.findFoodById)
+  .put(requireAuth(), foodController.updateFood)
 
 export default foodRouter

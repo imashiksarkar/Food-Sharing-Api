@@ -2,13 +2,14 @@ import { MongooseError, isValidObjectId } from 'mongoose'
 import Food from '../models/Food.model'
 import {
   AddFoodDto,
+  AuthorDetails,
   FoodRes,
   IFoodDocument,
   IFoodService,
 } from '../types/food.types'
 
 class FoodService implements IFoodService {
-  addFood = async (authorEmail: string, foodInput: AddFoodDto) => {
+  addFood = async (authorDetails: AuthorDetails, foodInput: AddFoodDto) => {
     const res: FoodRes<IFoodDocument> = {
       data: null,
       error: null,
@@ -17,7 +18,7 @@ class FoodService implements IFoodService {
     try {
       const newFood = new Food({
         ...foodInput,
-        authorEmail,
+        ...authorDetails,
       })
 
       const savedFood = await newFood.save()
@@ -78,6 +79,31 @@ class FoodService implements IFoodService {
 
       return res
     }
+  }
+
+  updateFoodById = async (id: string, foodInput: AddFoodDto) => {
+    const res: FoodRes<IFoodDocument> = {
+      data: null,
+      error: null,
+    }
+
+    if (!isValidObjectId(id)) {
+      res.error = 'Invalid id'
+      return res
+    }
+
+    try {
+      const food = await Food.findByIdAndUpdate(id, foodInput, { new: true })
+      if (!food) res.error = 'Food not found'
+
+      res.data = food
+    } catch (error) {
+      if (error instanceof MongooseError) res.error = error.message
+      else if (typeof error === 'string') res.error = error
+      else res.error = 'Unknown error - add food service'
+    }
+
+    return res
   }
 }
 

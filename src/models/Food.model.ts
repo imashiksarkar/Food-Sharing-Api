@@ -4,17 +4,17 @@ import { IFood, IFoodDocument, IFoodModel } from '../types/food.types'
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
-const foodSchema = new Schema(
+const foodSchema = new Schema<IFoodDocument>(
   {
     name: {
       type: String,
       trim: true,
       required: [true, 'Name is required.'],
     },
-    description: {
+    additionalNotes: {
       type: String,
       trim: true,
-      required: [true, 'Description is required.'],
+      required: [true, 'Additional notes is required.'],
     },
     imageUrl: {
       type: String,
@@ -40,6 +40,16 @@ const foodSchema = new Schema(
         validator: (authorEmail: string) => emailRegex.test(authorEmail),
         message: 'Author email must be valid.',
       },
+    },
+    donatorName: {
+      type: String,
+      trim: true,
+      required: [true, 'Donator name is required.'],
+    },
+    pickupLocation: {
+      type: String,
+      trim: true,
+      required: [true, 'Pickup location is required.'],
     },
   },
   {

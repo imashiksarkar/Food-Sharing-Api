@@ -4,9 +4,15 @@ import addFoodDto from '../dtos/food.dto'
 
 export type AddFoodDto = z.infer<typeof addFoodDto>
 
-// mongoose input data
-export interface IFood extends AddFoodDto {
+export interface AuthorDetails {
   authorEmail: string
+  donatorName: string
+}
+
+// mongoose input data
+export interface IFood extends AddFoodDto, AuthorDetails {
+  // authorEmail: string
+  // donatorName: string
 }
 
 // data from database
@@ -27,16 +33,18 @@ export interface FoodRes<T> {
 
 export interface IFoodService {
   addFood: (
-    authorEmail: string,
+    authorDetails: AuthorDetails,
     foodInput: AddFoodDto
   ) => Promise<FoodRes<IFoodDocument>>
+
   findAllFoods: () => Promise<FoodRes<IFoodDocument[]>>
+
   findFoodById: (id: string) => Promise<FoodRes<IFoodDocument | null>>
+  updateFoodById: (
+    id: string,
+    foodInput: AddFoodDto
+  ) => Promise<FoodRes<IFoodDocument>>
   // deleteFoodById: (id: string) => Promise<FoodRes<IFoodDocument | null>>
-  // updateFoodById: (
-  //   id: string,
-  //   foodInput: AddFoodDto
-  // ) => Promise<FoodRes<IFoodDocument | null>>
   // findFoodsByAuthorEmail: (
   //   authorEmail: string
   // ) => Promise<FoodRes<IFoodDocument[]>>
