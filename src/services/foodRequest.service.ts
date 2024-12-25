@@ -88,16 +88,6 @@ class FoodRequestService implements IFoodRequestService {
     }
   }
 
-  private getUserType = (foodRequest: IFoodRequestDocument, user: string) => {
-    if (foodRequest.requestedBy === user) return 'requester'
-    else if (
-      (foodRequest.food as unknown as IFoodDocument).authorEmail === user
-    )
-      return 'author'
-
-    return null
-  }
-
   updateFoodRequestStatus = async ({
     status,
     user,
@@ -128,6 +118,31 @@ class FoodRequestService implements IFoodRequestService {
         'updateFoodRequestStatus service - unknown error'
       )
     }
+  }
+
+  fetchFoodRequestsByRequestor = async (requestorEmail: string) => {
+    try {
+      return await FoodRequest.find({ requestedBy: requestorEmail })
+        .populate('food')
+        .sort({ updatedAt: -1 })
+    } catch (error: MongooseError | unknown) {
+      if (error instanceof Err) throw error
+      else if (error instanceof MongooseError)
+        throw Err.setStatus('InternalServerError').setMessage(error.message)
+      throw Err.setStatus('InternalServerError').setWhere(
+        'fetchFoodRequestsByRequestor service - unknown error'
+      )
+    }
+  }
+
+  private getUserType = (foodRequest: IFoodRequestDocument, user: string) => {
+    if (foodRequest.requestedBy === user) return 'requester'
+    else if (
+      (foodRequest.food as unknown as IFoodDocument).authorEmail === user
+    )
+      return 'author'
+
+    return null
   }
 
   private allowedStatus = (

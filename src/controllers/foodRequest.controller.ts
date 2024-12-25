@@ -1,10 +1,10 @@
 import { Response } from 'express'
+import { Err } from 'http-staror'
+import updateFoodRequestDto from '../dtos/foodRequest.dto'
 import { ReqWithUser } from '../middlewares/requireAuth'
 import foodRequestService from '../services/foodRequest.service'
 import { IFoodRequestService } from '../types/foodRequest.types'
 import catchAsync from '../utils/catchAsync'
-import updateFoodRequestDto from '../dtos/foodRequest.dto'
-import { Err } from 'http-staror'
 
 class FoodRequestController {
   constructor(private foodRequestService: IFoodRequestService) {}
@@ -39,6 +39,17 @@ class FoodRequestController {
         })
 
       res.status(200).json(updatedFoodRequest)
+    }
+  )
+
+  fetchFoodRequestsByRequestor = catchAsync(
+    async (req: ReqWithUser, res: Response) => {
+      const user = req.locals.user.email
+
+      const foodRequests =
+        await this.foodRequestService.fetchFoodRequestsByRequestor(user)
+
+      res.status(200).json(foodRequests)
     }
   )
 }

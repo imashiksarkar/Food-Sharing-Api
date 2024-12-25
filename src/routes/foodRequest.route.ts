@@ -4,6 +4,12 @@ import requireAuth from '../middlewares/requireAuth'
 
 const foodRequestRouter = Router()
 
+foodRequestRouter.get(
+  '/',
+  requireAuth(),
+  foodRequestController.fetchFoodRequestsByRequestor
+)
+
 foodRequestRouter
   .route('/:foodId')
   .put(requireAuth(), foodRequestController.addFoodRequest)

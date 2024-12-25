@@ -14,8 +14,8 @@ router.get('/health', HealthController.healthCheck)
 
 router.use('/auth', authRouter)
 
-router.use('/foods', foodRouter)
 router.use('/foods/request', foodRequestRouter)
+router.use('/foods', foodRouter)
 
 router.all('/*', notFoundController.notFound)
 

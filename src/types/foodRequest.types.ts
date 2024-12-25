@@ -55,4 +55,8 @@ export interface IFoodRequestService {
   updateFoodRequestStatus: (
     input: IUpdateFoodRequestStatusInput
   ) => Promise<IFoodRequestDocument | null>
+
+  fetchFoodRequestsByRequestor: (
+    requestorEmail: string
+  ) => Promise<IFoodRequestDocument[]>
 }
