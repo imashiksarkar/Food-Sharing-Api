@@ -4,11 +4,17 @@ import mongoose, { Document, Model } from 'mongoose'
 
 // export type AddFoodDto = z.infer<typeof addFoodDto>
 
+export type StatusEnumType =
+  | 'pending'
+  | 'accepted'
+  | 'rejected'
+  | 'delivered'
+  | 'cancelled'
 // mongoose input data
 export interface IFoodRequest {
-  foodId: mongoose.Schema.Types.ObjectId
+  food: mongoose.Schema.Types.ObjectId
   requestedBy: string // email
-  status?: 'pending' | 'accepted' | 'rejected' | 'delivered' | 'cancelled'
+  status: StatusEnumType
 }
 
 export interface IEligibility {
@@ -28,9 +34,25 @@ export interface IFoodRequestDocument extends Document, IFoodRequest {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IFoodRequestModel extends Model<IFoodRequestDocument> {}
 
+export interface IUpdateFoodRequestStatusInput {
+  user: string
+  foodRequestId: string
+  status: Exclude<StatusEnumType, 'pending'>
+}
+
+export type Permissions = {
+  [key in 'requester' | 'author']: {
+    [key in StatusEnumType]?: Exclude<StatusEnumType, 'pending'>[]
+  }
+}
+
 export interface IFoodRequestService {
   addFoodRequest: (
-    requestedBy: string,
+    user: string, //email
     foodId: string
   ) => Promise<IFoodRequestDocument>
+
+  updateFoodRequestStatus: (
+    input: IUpdateFoodRequestStatusInput
+  ) => Promise<IFoodRequestDocument | null>
 }

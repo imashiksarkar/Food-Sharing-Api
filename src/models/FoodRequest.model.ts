@@ -9,9 +9,9 @@ const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 const foodRequestSchema = new Schema<IFoodRequestDocument>(
   {
-    foodId: {
+    food: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Food',
       required: [true, 'Food id is required.'],
     },
     requestedBy: {

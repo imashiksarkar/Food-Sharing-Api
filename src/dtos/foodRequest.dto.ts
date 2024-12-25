@@ -1,5 +1,7 @@
 import z from 'zod'
 
-const addFoodDto = z.object({})
+const updateFoodRequestDto = z.object({
+  status: z.enum(['accepted', 'rejected', 'delivered', 'cancelled']),
+})
 
-export default addFoodDto
+export default updateFoodRequestDto

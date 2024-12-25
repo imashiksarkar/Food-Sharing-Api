@@ -4,10 +4,9 @@ import requireAuth from '../middlewares/requireAuth'
 
 const foodRequestRouter = Router()
 
-foodRequestRouter.put(
-  '/:foodId',
-  requireAuth(),
-  foodRequestController.addFoodRequest
-)
+foodRequestRouter
+  .route('/:foodId')
+  .put(requireAuth(), foodRequestController.addFoodRequest)
+  .patch(requireAuth(), foodRequestController.updateFoodRequestStatus)
 
 export default foodRequestRouter
