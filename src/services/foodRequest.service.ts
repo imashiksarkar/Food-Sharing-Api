@@ -108,7 +108,20 @@ class FoodRequestService implements IFoodRequestService {
       if (!this.allowedStatus(userType, oldStatus).includes(status))
         throw Err.setStatus('Unauthorized').setMessage('Permission denied')
 
-      return await foodRequest.updateOne({ status })
+      const updatedFood = await foodRequest.updateOne({ status })
+      if (
+        updatedFood.status === 'delivered' ||
+        updatedFood.status === 'accepted'
+      ) {
+        await Food.findOneAndUpdate(
+          { _id: foodRequest.food },
+          {
+            foodStatus: 'unavailable',
+          }
+        )
+      }
+
+      return updatedFood
     } catch (error: MongooseError | any) {
       if (error instanceof Err) throw error
       else if (error instanceof MongooseError)
