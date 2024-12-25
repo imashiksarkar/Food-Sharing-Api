@@ -12,6 +12,7 @@ foodRequestRouter.get(
 
 foodRequestRouter
   .route('/:foodId')
+  .get(requireAuth(), foodRequestController.findFoodRequestsByFoodId) // for author
   .put(requireAuth(), foodRequestController.addFoodRequest)
   .patch(requireAuth(), foodRequestController.updateFoodRequestStatus)
 

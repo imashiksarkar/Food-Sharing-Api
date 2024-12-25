@@ -135,6 +135,65 @@ class FoodRequestService implements IFoodRequestService {
     }
   }
 
+  findFoodRequestsByFoodId = async (foodId: string, authorEmail: string) => {
+    try {
+      return await FoodRequest.aggregate([
+        {
+          $match: {
+            food: new mongoose.Types.ObjectId(foodId),
+          },
+        },
+        {
+          $lookup: {
+            from: 'foods',
+            localField: 'food',
+            foreignField: '_id',
+            as: 'result',
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            requestedBy: 1,
+            status: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            food: {
+              $arrayElemAt: ['$result', 0],
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            requestedBy: 1,
+            status: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            authorEmail: '$food.authorEmail',
+          },
+        },
+        {
+          $match: {
+            authorEmail,
+          },
+        },
+        {
+          $sort: {
+            updatedAt: -1,
+          },
+        },
+      ])
+    } catch (error: MongooseError | unknown) {
+      if (error instanceof Err) throw error
+      else if (error instanceof MongooseError)
+        throw Err.setStatus('InternalServerError').setMessage(error.message)
+      throw Err.setStatus('InternalServerError').setWhere(
+        'findFoodRequestsByFoodId service - unknown error'
+      )
+    }
+  }
+
   private getUserType = (foodRequest: IFoodRequestDocument, user: string) => {
     if (foodRequest.requestedBy === user) return 'requester'
     else if (

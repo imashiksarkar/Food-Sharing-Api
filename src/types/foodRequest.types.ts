@@ -59,4 +59,9 @@ export interface IFoodRequestService {
   fetchFoodRequestsByRequestor: (
     requestorEmail: string
   ) => Promise<IFoodRequestDocument[]>
+
+  findFoodRequestsByFoodId: (
+    foodId: string,
+    authorEmail: string
+  ) => Promise<IFoodRequestDocument[]>
 }

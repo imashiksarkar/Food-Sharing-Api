@@ -52,6 +52,21 @@ class FoodRequestController {
       res.status(200).json(foodRequests)
     }
   )
+
+  findFoodRequestsByFoodId = catchAsync(
+    async (req: ReqWithUser, res: Response) => {
+      const foodId = req.params.foodId
+      const authorEmail = req.locals.user.email
+
+      const foodRequests =
+        await this.foodRequestService.findFoodRequestsByFoodId(
+          foodId,
+          authorEmail
+        )
+
+      res.status(200).json(foodRequests)
+    }
+  )
 }
 
 const foodRequestController = new FoodRequestController(foodRequestService)
