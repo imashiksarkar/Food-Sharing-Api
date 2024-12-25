@@ -1,7 +1,7 @@
 import { Err } from 'http-staror'
-import { MongooseError } from 'mongoose'
+import mongoose, { MongooseError } from 'mongoose'
 import FoodRequest from '../models/FoodRequest.model'
-import { IFoodRequestService } from '../types/foodRequest.types'
+import { IEligibility, IFoodRequestService } from '../types/foodRequest.types'
 import Food from '../models/Food.model'
 
 class FoodRequestService implements IFoodRequestService {
@@ -14,6 +14,56 @@ class FoodRequestService implements IFoodRequestService {
         throw Err.setStatus('BadRequest').setMessage(
           'You cannot request your own food'
         )
+
+      const isEligible = await FoodRequest.aggregate<IEligibility>([
+        {
+          $match: {
+            foodId: new mongoose.Types.ObjectId('676b2d800555baf7756d29f3'),
+            requestedBy: 'contact@ashiksarkar.xyz',
+          },
+        },
+        {
+          $group: {
+            _id: 'status',
+            status: {
+              $addToSet: '$status',
+            },
+            foodIds: {
+              $addToSet: '$foodId',
+            },
+            requestedBy: {
+              $addToSet: '$requestedBy',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            foodId: {
+              $toString: {
+                $arrayElemAt: ['$foodIds', 0],
+              },
+            },
+            requestedBy: {
+              $arrayElemAt: ['$requestedBy', 0],
+            },
+            isEligible: {
+              $allElementsTrue: {
+                $map: {
+                  input: '$status',
+                  as: 'currentStatus',
+                  in: {
+                    $eq: ['$$currentStatus', 'cancelled'],
+                  },
+                },
+              },
+            },
+          },
+        },
+      ])
+
+      if (isEligible.length > 0 && !isEligible[0].isEligible)
+        throw Err.setStatus('BadRequest').setMessage('Food already requested')
 
       return await FoodRequest.create({ foodId, requestedBy })
     } catch (error: MongooseError | any) {

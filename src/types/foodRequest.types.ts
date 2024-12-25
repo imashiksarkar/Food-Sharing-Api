@@ -11,6 +11,12 @@ export interface IFoodRequest {
   status?: 'pending' | 'accepted' | 'rejected' | 'delivered' | 'cancelled'
 }
 
+export interface IEligibility {
+  foodId: string
+  requestedBy: string
+  isEligible: boolean
+}
+
 // data from database
 export interface IFoodRequestDocument extends Document, IFoodRequest {
   _id: string

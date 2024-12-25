@@ -37,8 +37,6 @@ const foodRequestSchema = new Schema<IFoodRequestDocument>(
   }
 )
 
-foodRequestSchema.index({ foodId: 1, requestedBy: 1 }, { unique: true })
-
 const FoodRequestModel = model<IFoodRequestDocument, IFoodRequestModel>(
   'FoodRequest',
   foodRequestSchema
