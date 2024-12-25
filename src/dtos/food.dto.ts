@@ -8,6 +8,8 @@ export const foodCategory = [
   'drinks',
 ] as const
 
+export const foodStatus = ['available', 'unavailable'] as const
+
 const getMinDate = () => {
   const date = new Date()
   date.setMinutes(date.getMinutes() + 30) // add 30 minutes
@@ -32,8 +34,8 @@ const addFoodDto = z.object({
     .string()
     .trim()
     .min(3, 'Additional notes must be 3 chars or more.'),
+  foodStatus: z.enum(foodStatus).optional(),
+  quantity: z.number().min(50, 'Quantity must be at least 50 grams.'),
 })
-
-
 
 export default addFoodDto

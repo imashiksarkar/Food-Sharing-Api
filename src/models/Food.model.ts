@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose'
-import { foodCategory } from '../dtos/food.dto'
+import { foodCategory, foodStatus } from '../dtos/food.dto'
 import { IFood, IFoodDocument, IFoodModel } from '../types/food.types'
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -50,6 +50,19 @@ const foodSchema = new Schema<IFoodDocument>(
       type: String,
       trim: true,
       required: [true, 'Pickup location is required.'],
+    },
+    foodStatus: {
+      type: String,
+      trim: true,
+      required: [true, 'Food status is required.'],
+      enum: foodStatus,
+      default: 'available',
+    },
+    quantity: {
+      type: Number,
+      trim: true,
+      required: [true, 'Quantity is required.'],
+      min: 50,
     },
   },
   {
