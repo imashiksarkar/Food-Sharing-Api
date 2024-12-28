@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { Err } from 'http-staror'
-import addFoodDto, { queryParser } from '../dtos/food.dto'
+import addFoodDto, { foodCategory, queryParser } from '../dtos/food.dto'
 import { ReqWithUser } from '../middlewares/requireAuth'
 import foodService from '../services/food.service'
 import { IFoodService } from '../types/food.types'
@@ -111,6 +111,10 @@ class FoodController {
       res.status(200).json(data)
     }
   )
+
+  categories = catchAsync(async (_req: ReqWithUser, res: Response) => {
+    res.status(200).json(foodCategory)
+  })
 }
 
 const foodController = new FoodController(foodService)
