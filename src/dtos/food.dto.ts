@@ -38,4 +38,103 @@ const addFoodDto = z.object({
   quantity: z.number().min(50, 'Quantity must be at least 50 grams.'),
 })
 
+export const dbQuerySchema = z.preprocess(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (rawQuery: any) => {
+    rawQuery._id = rawQuery.id
+    delete rawQuery.id
+
+    const { fields, skip, limit, sort, select, ...query } = rawQuery
+
+    const parsedQuery = {
+      fields,
+      skip,
+      limit,
+      sort,
+      select,
+      query,
+    }
+
+    return parsedQuery
+  },
+  z.object({
+    fields: z
+      .string()
+      .trim()
+      .transform((fields) => fields?.split(','))
+      .optional(),
+    skip: z
+      .preprocess(
+        (value) => (typeof value === 'string' ? parseInt(value) : value),
+        z.number().min(0, 'Skip must be at least 0.')
+      )
+      .optional(),
+    limit: z.preprocess(
+      (value) => (typeof value === 'string' ? parseInt(value) : value),
+      z.number().min(2, 'Limit must be at least 2.').optional()
+    ),
+    sort: z
+      .string()
+      .transform((sort) => sort?.split(',').join(' '))
+      .optional(),
+    select: z
+      .string()
+      .transform((select) => select?.split(',').join(' '))
+      .optional(),
+    query: z
+      .object({
+        foodStatus: z.enum(foodStatus).optional(),
+        quantity: z
+          .any()
+          .transform((quantity, ctx) => {
+            if (typeof quantity === 'object') {
+              const {
+                data: operator,
+                error,
+                success,
+              } = z
+                .record(
+                  z
+                    .enum(['eq', 'gt', 'lt', 'gte', 'lte'])
+                    .transform((operator) => `$${operator}`),
+                  z.string().transform((value) => parseFloat(value))
+                )
+                .safeParse(quantity)
+
+              if (success) return operator
+
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const errors = error?.format() as any
+              delete errors._errors
+
+              for (const key in errors) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: JSON.stringify(errors[key]._errors),
+                  path: [key],
+                })
+              }
+
+              return operator
+            }
+
+            const quantityNumber = parseInt(quantity)
+            if (isNaN(quantityNumber)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Quantity must be a number.',
+                path: ['quantity'],
+              })
+            }
+
+            return quantityNumber
+          })
+          .optional(),
+        _id: z.string().optional(),
+        category: z.enum(foodCategory).optional(),
+      })
+      .optional(),
+  })
+)
+
 export default addFoodDto

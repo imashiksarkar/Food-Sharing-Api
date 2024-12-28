@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { Err } from 'http-staror'
-import addFoodDto from '../dtos/food.dto'
+import addFoodDto, { dbQuerySchema } from '../dtos/food.dto'
 import { ReqWithUser } from '../middlewares/requireAuth'
 import foodService from '../services/food.service'
 import { IFoodService } from '../types/food.types'
@@ -34,7 +34,13 @@ class FoodController {
     res.status(201).json(data)
   })
 
-  findAllFoods = catchAsync(async (_req: ReqWithUser, res: Response) => {
+  findAllFoods = catchAsync(async (req: ReqWithUser, res: Response) => {
+    const { data: parsedQuery, success } = dbQuerySchema.safeParse(req.query)
+
+    if (!success) throw Err.setStatus('BadRequest').setMessage('Invalid query')
+
+    console.log(JSON.parse(JSON.stringify(parsedQuery)))
+
     const { data, error } = await this.foodService.findAllFoods()
 
     if (error) throw Err.setStatus('InternalServerError').setMessage(error)
