@@ -1,6 +1,6 @@
 import { Document, Model } from 'mongoose'
 import z from 'zod'
-import addFoodDto from '../dtos/food.dto'
+import addFoodDto, { ParsedQuery } from '../dtos/food.dto'
 
 export type AddFoodDto = z.infer<typeof addFoodDto>
 
@@ -34,7 +34,7 @@ export interface IFoodService {
     foodInput: AddFoodDto
   ) => Promise<FoodRes<IFoodDocument>>
 
-  findAllFoods: () => Promise<FoodRes<IFoodDocument[]>>
+  findAllFoods: (parsedQuery: ParsedQuery) => Promise<FoodRes<IFoodDocument[]>>
 
   findFoodById: (id: string) => Promise<FoodRes<IFoodDocument | null>>
   updateFoodById: (

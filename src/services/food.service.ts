@@ -8,6 +8,7 @@ import {
   IFoodService,
 } from '../types/food.types'
 import { Err } from 'http-staror'
+import { ParsedQuery } from '../dtos/food.dto'
 
 class FoodService implements IFoodService {
   addFood = async (authorDetails: AuthorDetails, foodInput: AddFoodDto) => {
@@ -36,24 +37,39 @@ class FoodService implements IFoodService {
     }
   }
 
-  findAllFoods = async () => {
+  findAllFoods = async (parsedQuery: ParsedQuery) => {
     const res: FoodRes<IFoodDocument[]> = {
       data: null,
       error: null,
     }
     try {
-      const foods = await Food.find()
+      // const foods = await Food.find()
+
+      // res.data = foods
+
+      // return res
+      console.log({ ...parsedQuery.query })
+
+      let query = Food.find({
+        ...parsedQuery.query,
+      })
+
+      // if(parsedQuery.fields) query = query.select(parsedQuery.fields)
+      if (parsedQuery.select) query = query.select(parsedQuery.select)
+      if (parsedQuery.sort) query = query.sort(parsedQuery.sort)
+      if (parsedQuery.skip) query = query.skip(parsedQuery.skip)
+      if (parsedQuery.limit) query = query.limit(parsedQuery.limit)
+
+      const foods = await query
 
       res.data = foods
-
-      return res
     } catch (error) {
       if (error instanceof MongooseError) res.error = error.message
       else if (typeof error === 'string') res.error = error
       else res.error = 'Unknown error - add food service'
-
-      return res
     }
+
+    return res
   }
 
   findFoodById = async (id: string) => {

@@ -38,7 +38,7 @@ const addFoodDto = z.object({
   quantity: z.number().min(50, 'Quantity must be at least 50 grams.'),
 })
 
-export const dbQuerySchema = z.preprocess(
+const dbQuerySchema = z.preprocess(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (rawQuery: any) => {
     rawQuery._id = rawQuery.id
@@ -95,7 +95,7 @@ export const dbQuerySchema = z.preprocess(
               } = z
                 .record(
                   z
-                    .enum(['eq', 'gt', 'lt', 'gte', 'lte'])
+                    .enum(['eq', 'gt', 'lt', 'gte', 'lte', 'ne'])
                     .transform((operator) => `$${operator}`),
                   z.string().transform((value) => parseFloat(value))
                 )
@@ -136,5 +136,14 @@ export const dbQuerySchema = z.preprocess(
       .optional(),
   })
 )
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const queryParser = (query: Record<string, any>) => {
+  const parsed = dbQuerySchema.safeParse(query)
+  parsed.data = JSON.parse(JSON.stringify(parsed.data))
+  return parsed
+}
+
+export type ParsedQuery = z.infer<typeof dbQuerySchema>
 
 export default addFoodDto
