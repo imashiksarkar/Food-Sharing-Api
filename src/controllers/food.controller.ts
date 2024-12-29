@@ -39,8 +39,6 @@ class FoodController {
 
     if (!success) throw Err.setStatus('BadRequest').setMessage('Invalid query')
 
-    // console.log(parsedQuery)
-
     const { data, error } = await this.foodService.findAllFoods(parsedQuery)
 
     if (error) throw Err.setStatus('InternalServerError').setMessage(error)
@@ -91,8 +89,6 @@ class FoodController {
   })
 
   findFoodByCategory = catchAsync(async (req: ReqWithUser, res: Response) => {
-    console.log(req.params.categoryName)
-
     const { data, error } = await this.foodService.findFoodsByCategory(
       req.params.categoryName
     )

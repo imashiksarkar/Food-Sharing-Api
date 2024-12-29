@@ -43,13 +43,6 @@ class FoodService implements IFoodService {
       error: null,
     }
     try {
-      // const foods = await Food.find()
-
-      // res.data = foods
-
-      // return res
-      console.log({ ...parsedQuery.query })
-
       let query = Food.find({
         ...parsedQuery.query,
       })
