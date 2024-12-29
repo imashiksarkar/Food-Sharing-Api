@@ -36,8 +36,6 @@ class FoodController {
 
   findAllFoods = catchAsync(async (req: ReqWithUser, res: Response) => {
     const { data: parsedQuery, success } = queryParser(req.query)
-    console.log(parsedQuery)
-
 
     if (!success) throw Err.setStatus('BadRequest').setMessage('Invalid query')
 
