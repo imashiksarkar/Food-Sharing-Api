@@ -14,14 +14,20 @@ import { IFoodDocument } from '../types/food.types'
 
 class FoodRequestService implements IFoodRequestService {
   addFoodRequest = async (requestedBy: string, foodId: string) => {
+    const foodSession = await Food.startSession()
     try {
+      await foodSession.startTransaction()
       const food = await Food.findById(foodId)
 
-      if (!food) throw Err.setStatus('BadRequest').setMessage('Food not found')
-      else if (food.authorEmail === requestedBy)
+      if (!food) {
+        await foodSession.abortTransaction()
+        throw Err.setStatus('BadRequest').setMessage('Food not found')
+      } else if (food.authorEmail === requestedBy) {
+        await foodSession.abortTransaction()
         throw Err.setStatus('BadRequest').setMessage(
           'You cannot request your own food'
         )
+      }
 
       const isEligible = await FoodRequest.aggregate<IEligibility>([
         {
@@ -70,11 +76,30 @@ class FoodRequestService implements IFoodRequestService {
         },
       ])
 
-      if (isEligible.length > 0 && !isEligible[0].isEligible)
+      if (isEligible.length > 0 && !isEligible[0].isEligible) {
+        await foodSession.abortTransaction()
         throw Err.setStatus('BadRequest').setMessage('Food already requested')
+      }
 
-      return await FoodRequest.create({ food: foodId, requestedBy })
+      const foodRequest = await FoodRequest.create({
+        food: foodId,
+        requestedBy,
+      })
+
+      await Food.updateOne(
+        { _id: foodId },
+        { $set: { foodStatus: 'unavailable' } },
+        { session: foodSession }
+      )
+
+      await foodSession.commitTransaction()
+
+      return foodRequest
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: MongooseError | any) {
+      if (foodSession.inTransaction()) await foodSession.abortTransaction()
+
       if (error instanceof Err) throw error
       else if (error instanceof MongooseError)
         throw Err.setStatus('InternalServerError').setMessage(error.message)
@@ -85,6 +110,8 @@ class FoodRequestService implements IFoodRequestService {
       throw Err.setStatus('InternalServerError').setWhere(
         'addFoodRequest service - unknown error'
       )
+    } finally {
+      await foodSession.endSession()
     }
   }
 
@@ -122,6 +149,8 @@ class FoodRequestService implements IFoodRequestService {
       }
 
       return updatedFood
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: MongooseError | any) {
       if (error instanceof Err) throw error
       else if (error instanceof MongooseError)
