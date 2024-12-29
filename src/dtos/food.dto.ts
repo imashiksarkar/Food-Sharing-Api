@@ -132,6 +132,7 @@ const dbQuerySchema = z.preprocess(
           .optional(),
         _id: z.string().optional(),
         category: z.enum(foodCategory).optional(),
+        authorEmail: z.string().email().optional(),
       })
       .optional(),
   })
