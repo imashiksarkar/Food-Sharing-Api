@@ -25,8 +25,8 @@ class AuthController {
 
     res.cookie('access_token', token, {
       httpOnly: true,
-      sameSite: env.IS_PRODUCTION ? 'none' : 'lax',
-      secure: env.IS_PRODUCTION,
+      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: env.NODE_ENV === 'production',
       maxAge: 1000 * 60 * 60, //1h
     })
 
